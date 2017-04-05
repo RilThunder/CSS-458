@@ -17,6 +17,7 @@ Here's an example of the sort of input/output I'd like to see. I'm assuming you 
 
 >>> print exponential(3.4, tol=1e-8)
 29.9641000474
+
 Note that you can decide how to use tol. If you use it to specify the number of digits after the decimal point, you'll get one kind of behavior. If you use it to specify some relative error (e.g., as a percentage), you'll get another kind of behavior. I'm leaving it up to you as to what algorithm to use. Thus, your output may be slightly different than the above sample. I'll account for that in my testing/grading.
 
 Grading
