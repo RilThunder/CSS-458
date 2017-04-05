@@ -1,7 +1,5 @@
 The exponential function can be calculated by a series expansion:
 
-e^{x} = \sum_{n=0}^{\infty} \frac{x^n}{n!} e x = ∑ n = 0 ∞ x n n !
-
 Write a function that takes a scalar input x and provides scalar output of the exponential function. A few notes/hints:
 
 The math module has a factorial function.
