@@ -48,8 +48,12 @@ def main():
     # Get the flatted version of the 500 pairs ( 1000 elements now)
     flattenArray = np.ndarray.flatten(pairArray)
     # The blue histogram is the flattenArray with 1000 elements
+    plt.figure(1)
     plt.hist(flattenArray)
+    plt.xlabel('Value')
+    plt.ylabel('Frequency')
     # The organge and green bar is the pairArray where the orange is x value and green is y value
+    plt.figure(2)
     plt.hist(pairArray)
     plt.xlabel('Value')
     plt.ylabel('Frequency')

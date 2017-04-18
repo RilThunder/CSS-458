@@ -46,3 +46,5 @@ plt.plot(simulation, relativeError[:, 0])  # Only need the first column of the r
 plt.ylabel('Relative Error')
 plt.xlabel('Number of darts')
 plt.show()
+
+# As the number of darts increase, the relative error start to become smaller
