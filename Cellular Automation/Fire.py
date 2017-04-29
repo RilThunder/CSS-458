@@ -15,53 +15,73 @@
 # Next value based on site and nearest neighbors (N, E, S, W) 
 #
 
-from graphics import *
-import matplotlib.pylot as plt
+
+# Tiny modification by Thuan Tran
+# Module 10.3 Project 9
+# Date April 29th,2017
+
+
+import numpy as np
+from numpy.polynomial import Polynomial
 from random import random
 
+import matplotlib.pyplot as plt
+
+# Constants
 EMPTY = 0
 TREE = 1
 BURNING = 2
-
+TIMESTEP = 10
 WIN_SIZE = 300
 
 
 def main():
     t = 5  # number of time steps
-    n = 19  # size of forest
+    n = 17  # size of forest
+    percentListEachExperiment = []
     percentList = []
     probability = (0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
     index = 0
-    for number in range(8):
+    # Do 8 experiments, each with different probability of burning
+    for number in range(9):
         forest = initForest(n)
 
         grids = []
         grids.append(forest)
+        for experiment in range(10):
+            for i in range(TIMESTEP):
+                forestExtended = extendLat(forest)
+                forest = applyExtended(forestExtended, probability[index])
+                grids.append(forest)
 
-        for i in range(10):
-            forestExtended = extendLat(forest)
-            forest = applyExtended(forestExtended, probability[index])
-            grids.append(forest)
-        # print "After generation"
-        #    for grid in grids:
-        #        displayMat(grid)
-        #        print
-        finalResult = grids[-1]
+            finalResult = grids[-1]
 
-        count = 0.0
-        for i in finalResult:
-            for j in i:
-                if j != TREE:
-                    count += 1
+            # Count how many area that is not tree
+            count = 0.0
+            for i in finalResult:
+                for j in i:
+                    if j != TREE:
+                        count += 1
 
-        percent = count / (n - 2) ** 2
-        percentList.append(percent)
+            percent = count / ((n) ** 2)
+            # Get the percent of buring at each simulation at each probability of burning
+            percentListEachExperiment.append(percent)
+        # Get the average percent of burning for that probability
+        percentList.append(np.average(np.asarray(percentListEachExperiment)))
         index = index + 1
-    print('The percentage of tree burned in each simulation ')
+        percentListEachExperiment = []
+    print('The average percentage of tree burned in each simulation ')
     print(percentList)
-    plt.plot(probability, percentList)
+    plt.figure()
+    plt.plot(probability, percentList, label='Calculated Data')
+    # Decided to use 5th order polynomial
+    p = Polynomial.fit(probability, percentList, 5)
+    plt.plot(*p.linspace(), label='Curved Data')
+    plt.legend(loc='upper left')
+    plt.xlabel('Probability of burning')
+    plt.ylabel('Percent of tree burned')
+    plt.title('Graph that show the percent of tree burn as probability of burn increase')
     plt.show()
-    # showGraphs(grids)
 
 
 # Function to return forest of all trees with one burning
@@ -73,6 +93,7 @@ def initForest(n):
     probBurning = 0.5
     for i in range(n):
         for j in range(n):
+            # Initialize the middle tree to burning
             if (i == n / 2 and j == n / 2):
                 forest[i].append(BURNING)
                 continue
@@ -144,7 +165,7 @@ def spread(site, N, E, S, W, burnProbability):
         returnValue = EMPTY
     elif (site == TREE) and ((N == BURNING) or (E == BURNING) or
                                  (S == BURNING) or (W == BURNING)):
-
+        # There is now no probability of lightning or immune
         if (random() < burnProbability):
             returnValue = BURNING
         else:
@@ -155,35 +176,6 @@ def spread(site, N, E, S, W, burnProbability):
         returnValue = TREE
 
     return returnValue
-
-
-# Function to display animation of a list of grids
-
-def showGraphs(graphList):
-    win = GraphWin("Fire", WIN_SIZE, WIN_SIZE)
-    win.setBackground("white")
-    for grid in graphList:
-        drawMat(win, grid)
-
-
-# Function to draw matrix
-# Empty (EMPTY = 0) shows yellow; tree (TREE = 1) shows green;
-# burning tree (BURNING = 2) shows burnt orange.
-
-def drawMat(win, mat):
-    n = len(mat) - 2
-    width = WIN_SIZE / (n + 1)
-    for j in range(1, n + 1):
-        for i in range(1, n + 1):
-            cell = Rectangle(Point(width * i, width * j), \
-                             Point(width * (i + 1), width * (j + 1)))
-            if (mat[i][j] == EMPTY):
-                cell.setFill("yellow1")
-            elif (mat[i][j] == TREE):
-                cell.setFill("green2")
-            else:
-                cell.setFill("orange2")
-            cell.draw(win)
 
 
 main()
