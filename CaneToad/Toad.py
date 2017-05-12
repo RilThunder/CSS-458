@@ -199,63 +199,79 @@ class Toad:
         self.here()
         self.useWaterEnergyHopping()
 
+    """""
+            This method is used to move all the toad west
+    """""
     def moveW(self):
-        theCoordinates[self.currentX][self.currentY].theToad = None
+        Toad.theCoordinates[self.currentX][self.currentY].theToad = None
         self.currentY -= 1
         self.here()
         self.useWaterEnergyHopping()
 
+    """""
+            This method is used by the toad to look for nearby Food
+    """""
     def lookForFood(self):
-        if self.currentY == CTConstant.SIZE - 1 and theCoordinates[self.currentX][self.currentY - 1].isDesert:
+        # On a Desert
+        if self.currentY == CTConstant.SIZE - 1 and Toad.theCoordinates[self.currentX][self.currentY - 1].isDesert:
             self.moveW()
         else:
+            # At the start border
             if self.currentY == CTConstant.SIZE - 1:
                 self.stayHere()
             else:
                 self.goToFood()
 
+    """""
+        This method is used by the toad to go to the nearest food 
+        This method also work in the same way as lookForMoisture where it look for the surrounding Von-Newuman neighbors
+    """""
     def goToFood(self):
         currentFood = []
         # Get the Food in East, South, West, North
-        currentFood.append(theCoordinates[self.currentX][self.currentY + 1].moisture)
+        currentFood.append(Toad.theCoordinates[self.currentX][self.currentY + 1].food)
 
-        currentFood.append(theCoordinates[self.currentX + 1][self.currentY].moisture)
+        currentFood.append(Toad.theCoordinates[self.currentX + 1][self.currentY].food)
 
-        currentFood.append(theCoordinates[self.currentX][self.currentY - 1].moisture)
+        currentFood.append(Toad.theCoordinates[self.currentX][self.currentY - 1].food)
 
-        currentFood.append(theCoordinates[self.currentX - 1][self.currentY].moisture)
+        currentFood.append(Toad.theCoordinates[self.currentX - 1][self.currentY].food)
         max = currentFood.index(max(currentFood))
         if max == 1:
-            theCoordinates[self.currentX][self.currentY].theToad = None
+            Toad.theCoordinates[self.currentX][self.currentY].theToad = None
             self.currentX += 1
 
-            theCoordinates[self.currentX][self.currentY].theToad = self
+            Toad.theCoordinates[self.currentX][self.currentY].theToad = self
             self.here()
             self.useWaterEnergyHopping()
         if max == 2:
-            theCoordinates[self.currentX][self.currentY].theToad = None
+            Toad.theCoordinates[self.currentX][self.currentY].theToad = None
             self.currentY -= 1
 
-            theCoordinates[self.currentX][self.currentY].theToad = self
+            Toad.theCoordinates[self.currentX][self.currentY].theToad = self
             self.here()
             self.useWaterEnergyHopping()
         else:
             if max == 3:
-                theCoordinates[self.currentX][self.currentY].theToad = None
+                Toad.theCoordinates[self.currentX][self.currentY].theToad = None
                 self.currentX -= 1
 
-                theCoordinates[self.currentX][self.currentY].theToad = self
+                Toad.theCoordinates[self.currentX][self.currentY].theToad = self
                 self.here()
                 self.useWaterEnergyHopping()
             else:
                 if max == 0:
-                    theCoordinates[self.currentX][self.currentY].theToad = None
+                    Toad.theCoordinates[self.currentX][self.currentY].theToad = None
                     self.currentY += 1
-                    theCoordinates[self.currentX][self.currentY].theToad = self
+                    Toad.theCoordinates[self.currentX][self.currentY].theToad = self
                     self.here()
                     self.useWaterEnergyHopping()
 
+    """""
+        This method is used by the toad when it does nothing and just sit around
+    """""
     def useWaterEnergySitting(self):
+        # Check if it is on the start border or on a desert
         if self.currentY == CTConstant.SIZE - 1:
             self.energy = self.energy - 0.5 * CTConstant.ENERGY_HOPPING
             self.water = self.water - 0.5 * CTConstant.WATER_HOPPING
@@ -264,24 +280,38 @@ class Toad:
             self.energy = self.energy - 0.5 * CTConstant.ENERGY_HOPPING
             self.water = self.water - 0.5 * CTConstant.WATER_HOPPING
             return
+
         self.energy = self.enery - 0.5 * CTConstant.ENERGY_HOPPING
 
+    """""
+        This method is used by the toad when it does nothing and just sit around
+    """""
     def useWaterEnergyHopping(self):
+        # Check if it on the start border or on the desert
         if self.currentY == CTConstant.SIZE - 1 or self.theCoordinates[self.currentX][self.currentY].isDesert:
             self.energy = self.energy - CTConstant.ENERGY_HOPPING
             self.water = self.water - CTConstant.WATER_HOPPING
             return
         self.energy = self.energy - CTConstant.ENERGY_HOPPING
 
+    """""
+        This method is used by the toad to hop around
+    """""
     def hopForFun(self):
+        # If the toad is on the start border and left  is a desert then move west
         if self.currentY == CTConstant.SIZE - 1 and self.theCoordinates[self.currentX][self.currentY - 1].isDesert:
             self.moveW()
             return
+        # Else just stay here
         if self.currentY == CTConstant.SIZE - 1:
             self.stayHere()
             return
         self.stayHere()
 
+    """""
+        This method is used to update the total number of toads that tis available at the moment
+        Toad will die if the water, energy go below the threshold
+    """""
     def changeCounts(self):
         if self.water < CTConstant.DESICCATE or self.energy < CTConstant.STARVE \
                 or self.currentY == 0:

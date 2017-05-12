@@ -1,9 +1,19 @@
+"""""
+    Name: Thuan Tran
+    CSS 458
+    Agent Based Modeling : Cane Toad
+"""""
 import random
 import CTConstant
 import Toad
 
 
 class Desert:
+    """""
+        This method is used to construct a desert again
+        Each desert agent will have a variable to reference the toad that is on the desert agent
+        Each Desert agient can be a normal one, AWP or FencedAWP 
+    """""
     def __init__(self):
 
         self.color = None # Color represent the state of the Desert
@@ -14,6 +24,9 @@ class Desert:
         self.food = CTConstant.FOOD_CELL
         self.moisture = 0
 
+    """""
+        This method is used to turn the current Desert agent into AWP 
+    """""
     def placeAwps(self):
         # Only change if this is not an AWP and there is a chance of changing
         if not self.isAwp:
@@ -24,6 +37,9 @@ class Desert:
                 return True
         return False
 
+    """""
+        This method is used to place Fenced AWP at the current Desert agent
+    """""
     def placeFencedAwps(self):
         # Can only change if it is already an AWP and not yet a Fenced pone
         if self.isAwp and self.isAwpFenced == False:
@@ -80,14 +96,23 @@ class Desert:
             theGrid[x + 2][y + 2].moisture = CTConstant.AMT_AWP_OVER2
         return theGrid
 
+    """""
+        This method is used to update the Food at the current position after a toad has eat it
+    """""
     def updateFood(self):
         # See how much the toad at this position eat
         amountEaten = self.theToad.eat()
         self.food = self.food - amountEaten
 
+    """""
+        This method is used to turn a Fenced AWP into an AWP
+    """""
     def makeUnfenced(self):
         self.isAwpFenced = False
 
+    """""
+        This method is used to turn an AWP agent into an AWP Fenced agent
+    """""
     def makeFenced(self):
         if (self.isAwp):
             self.isAwpFenced = True

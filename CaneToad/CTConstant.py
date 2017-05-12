@@ -1,3 +1,8 @@
+"""""
+    This is a class that hold static variable for the Cane Toad simulation
+"""""
+
+
 AMT_AWP = 1
 SIZE = 42
 AMT_AWP_ADJACENT = 0.4
