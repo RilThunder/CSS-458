@@ -5,7 +5,7 @@
 """""
 import random
 import CTConstant
-import Toad
+
 
 
 class Desert:
@@ -29,7 +29,7 @@ class Desert:
     """""
     def placeAwps(self):
         # Only change if this is not an AWP and there is a chance of changing
-        if not self.isAwp:
+        if self.isDesert:
             if (random.uniform(0, 1.0) < CTConstant.PERCENT_AWP):
                 self.isDesert = False
                 self.isAwp = True
@@ -100,9 +100,10 @@ class Desert:
         This method is used to update the Food at the current position after a toad has eat it
     """""
     def updateFood(self):
-        # See how much the toad at this position eat
-        amountEaten = self.theToad.eat()
-        self.food = self.food - amountEaten
+        # See how much the toad at this position eat. Only if there is a toad
+        if self.theToad is not None:
+            amountEaten = self.theToad.eat()
+            self.food = self.food - amountEaten
 
     """""
         This method is used to turn a Fenced AWP into an AWP

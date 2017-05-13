@@ -2,11 +2,15 @@
     Name: Thuan Tran
     CSS 458
     Agent-Based Modeling: Cane Toad
-""""
-import Desert
-import Border
+"""""
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+from pandas.tools.plotting import lag_plot
+from Desert import Desert
+from Border import Border
 import CTConstant
-
+from Toad import Toad
 
 class SimulationDriver():
     def __init__(self):
@@ -32,15 +36,51 @@ class SimulationDriver():
         This is the method that represent phase 0 of the simulation
       """""
     def phase0(self):
-        # Create Desert Agent and place Awps
-        # Also placeFencedAwps and init Awp
-
-        for x in range(1, self.size - 1): # Skip the first row
+        for x in range(1, self.size - 1): # Skip the first row and last
             for y in range(1, self.size - 1):
                 self.theGrid[x][y] = Desert()
                 self.theGrid[x][y].placeAwps()
                 self.theGrid[x][y].placeFencedAwps()
                 self.listOfDesert.append(self.theGrid[x][y])
+
+
+        # Create Desert Agent and place Awps
+        # Also placeFencedAwps and init Awp
+        for x in range(self.size):
+            # Finish Point West
+            self.theGrid[x][0] = Border(2, 2)
+            # Starting point East, want to move toads away from there
+            self.theGrid[x][-1] = Border(-1, -1)
+            # Do not allow toad to be created on the top right and bottom right
+            if x != 0 and x != CTConstant.SIZE -1:
+                value = self.theGrid[x][-1].createToads()
+                # WE have succesfully create a toad at that location
+                if (value):
+
+
+                    self.listOfToads.append(self.theGrid[x][-1].theToad)
+
+
+        Toad.theCoordinates = self.theGrid
+        # Go through every column in the first and last row and put a Border agent on it
+        for x in range(1, self.size):
+            # Border on North and South
+            self.theGrid[0][x] = Border(-1, -1)
+            self.theGrid[-1][x] = Border(-1, -1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         # After we created Awps, now we need to initialize the surrounding area
         for x in range(1, self.size - 1):
             for y in range(1, self.size - 1):
@@ -50,21 +90,7 @@ class SimulationDriver():
                     self.theGrid = self.theGrid[x][y].initAwp2(self.theGrid, x, y)
 
         # Create the border around the grid
-        for x in range(self.size):
-            # Finish Point West
-            self.theGrid[x][0] = Border(2, 2)
-            # Starting point East
-            self.theGrid[x][-1] = Border(-1, -1)
-            value = self.theGrid[x][-1].createToads()
-            if (value):
-                self.listOfToads.append(self.theGrid[x][-1].theToad)
-                self.ToadsLocation.append((x, -1))
 
-        # Go through every column in the first and last row and put a Border agent on it
-        for x in range(1, self.size):
-            # Border on North and South
-            self.theGrid[0][x] = Border(-1, -1)
-            self.theGrid[-1][x] = Border(-1, -1)
         self.phase = 1
 
     """""
@@ -85,3 +111,44 @@ class SimulationDriver():
         for i in self.listOfToads:
             i.toadMove()
         self.phase = 3
+
+    def run(self,value):
+        i = 1
+        data = []
+        while True :
+
+            if self.phase == 0:
+                self.phase0()
+            if self.phase == 1:
+                self.phase1()
+            if self.phase == 2:
+                self.phase2()
+            if self.phase == 3:
+                self.phase3()
+            print("At the " + str(i) + " iteration, the number of Toad alive, dead and migrated are")
+            print(Toad.numberAlive)
+            if (value):
+                data.append(Toad.numberAlive)
+            print(Toad.numberDead)
+            print(Toad.numberMigrated)
+            if Toad.numberAlive == 0:
+                break
+            i+=1
+        if value:
+            plt.figure()
+            lag_plot(pd.Series(data))
+            plt.xlabel("Toads")
+            plt.ylabel("Toads in next iteration")
+            plt.title(" A log plot of number of Toad Alive ")
+            plt.show()
+        return i
+
+
+    def phase3(self):
+
+        for i in self.listOfToads:
+            i.changeCounts()
+            if i.state == 0:
+                self.listOfToads.remove(i)
+        self.phase = 1
+

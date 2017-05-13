@@ -20,6 +20,7 @@ class Toad:
     # How many are surviving at the moment
     numberAlive = 0
     numberDead = 0
+    numberMigrated  =0
 
     # The grid all of toad, this will be composed of both Border and Desert class
     theCoordinates = None
@@ -37,11 +38,11 @@ class Toad:
         self.currentX = 0
         # Start at the east Border
         self.currentY = CTConstant.SIZE - 1
-
+        self.state = 1
         self.amtEat = 0  # Amount Eaten
 
-        self.energy = CTConstant.AMT_MIN_INIT + random.uniform(CTConstant.INIT_RANGE)
-        self.water = CTConstant.AMT_MIN_INIT + random.uniform(CTConstant.INIT_RANGE)
+        self.energy = CTConstant.AMT_MIN_INIT + random.uniform(0,CTConstant.INIT_RANGE)
+        self.water = CTConstant.AMT_MIN_INIT + random.uniform(0,CTConstant.INIT_RANGE)
 
         self.availableFood = -1
         self.availableMoisture = -1
@@ -116,6 +117,9 @@ class Toad:
            The method will check for its surrounding area and decided where to go to look for water
        """""
     def thirsty(self):
+
+        if self.currentX == 0 or self.currentX == CTConstant.size -1 or self.currentY == 0 or self.currentY == CTConstant.size -1:
+            return
         if Toad.theCoordinates[self.currentX][self.currentY].isAwp:
             self.stayHere()
             return
@@ -299,6 +303,7 @@ class Toad:
     """""
     def hopForFun(self):
         # If the toad is on the start border and left  is a desert then move west
+
         if self.currentY == CTConstant.SIZE - 1 and self.theCoordinates[self.currentX][self.currentY - 1].isDesert:
             self.moveW()
             return
@@ -315,7 +320,14 @@ class Toad:
     def changeCounts(self):
         if self.water < CTConstant.DESICCATE or self.energy < CTConstant.STARVE \
                 or self.currentY == 0:
+
             self.theCoordinates[self.currentX][self.currentY].theToad = None
+            if self.currentY == 0:
+                Toad.numberMigrated +=1
+            else:
+                Toad.numberDead +=1
+
             Toad.numberAlive -= 1
-            Toad.numberDead += 1
+
+            self.state = 0
             return
